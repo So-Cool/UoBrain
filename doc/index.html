@@ -1,0 +1,1948 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/my_theme.css">
+    <link rel="stylesheet" href="css/my.css">
+
+    <script src="lib/underscore.js"></script>
+    <script src="js/mapper.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script src="https://vega.github.io/vega/vega.min.js"></script>
+
+    <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
+    <!--<script src="lib/d3.js"></script>-->
+    <!--<script src="https://vega.github.io/vega/vega-core.min.js"></script>-->
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <div style="width: 960px; top: 0px; margin: auto;"><!-- position: absolute;-->
+                <h1 style="font-size: 250px;">Uo<img style="vertical-align: middle;" src="img/hbrain.png">rain</h1>
+          </div>
+          <div style="width: 800px; left: 0px; top: 0px; height: auto; margin: auto; margin-top: 50px;">
+              <h2 style="font-size: 50px;">Neural model of the University of Bristol researchers and their work</h2>
+         </div>
+          <div style="width: 960px; bottom: 0em; font-size: 20px;">
+              Kacper Sokol
+         </div>
+      </section>
+
+      <section>
+        <section>
+          <h2 style="margin: 0 0 40px 0;">University of Bristol modelled as a brain</h2>
+          <div style="width: 100%;">
+            <div style="float: left; width: 60%;">
+              <ul>
+                <li>Brain &mdash; University of Bristol</li>
+                <li class="fragment" data-fragment-index="1">Lobes &mdash; Faculties</li>
+                <li class="fragment" data-fragment-index="2">Lobules &mdash; Schools</li>
+                <li class="fragment" data-fragment-index="3">&hellip;</li>
+                <li class="fragment" data-fragment-index="3">Neurons &mdash; Researchers</li>
+              </ul>
+            </div>
+            <div style="float: right; width: 40%;">
+              <img class="fragment fade-out" data-fragment-index="3" style="vertical-align: middle;" src="img/lobes.svg">
+              <span class="fragment fade-out" data-fragment-index="1" style="position: relative; top: -200px; font-size: 80px; color: white; text-shadow: 2px 2px 0px #000000;"><b>UoB</b></span>
+              <div class="fragment current-visible" data-fragment-index="1" style="position: relative; color: white; text-shadow: 2px 2px 0px #000000;">
+                <div style="position: absolute; top: -290px; left: 32px; font-size: 30px; -ms-transform: rotate(-40deg); -webkit-transform: rotate(-40deg); transform: rotate(-40deg);"><b>Biomedical<br>Sciences</b></div>
+                <div style="position: absolute; top: -310px; left: 205px; font-size: 30px;"><b>Science</b></div>
+                <div style="position: absolute; top: -230px; left: 132px; font-size: 30px;"><b>Engineering</b></div>
+                <div style="position: absolute; top: -240px; left: 300px; font-size: 30px; -ms-transform: rotate(-80deg); -webkit-transform: rotate(-80deg); transform: rotate(-80deg);"><b>Arts</b></div>
+              </div>
+              <div class="fragment current-visible" data-fragment-index="2" style="position: relative; color: white; text-shadow: 2px 2px 0px #000000;">
+                <div style="position: absolute; top: -275px; left: 22px; font-size: 16px; -ms-transform: rotate(-50deg); -webkit-transform: rotate(-50deg); transform: rotate(-50deg);">Cellular &amp; Molecular Medicine<br>Biochemistry</div>
+                <div style="position: absolute; top: -325px; left: 195px; font-size: 16px;">Mathematics<br>Physics<br>Chemistry</div>
+                <div style="position: absolute; top: -230px; left: 145px; font-size: 16px;">Merchant Venturers'<br>Queen's</div>
+                <div style="position: absolute; top: -240px; left: 285px; font-size: 16px; -ms-transform: rotate(-70deg); -webkit-transform: rotate(-70deg); transform: rotate(-70deg);">Humanities<br>Arts</div>
+              </div>
+              <div class="fragment" data-fragment-index="3" style="position: relative; top: -320px;">
+                <img class="fragment" data-fragment-index="3" style="vertical-align: middle; -ms-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); transform: rotate(-90deg);" src="img/neuron.svg">
+                <p style="position: relative; top: 40px; font-size: 20px; color: white; text-shadow: 2px 2px 0px #000000;">Researcher ID: 123456</p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section>
+              <h2>Collaboration = Excitation</h2><!--<h2>Collaboration is Exciting</h2>-->
+              <p style="font-size: 25px;">Each researcher is modelled as an <i>excitatory neuron</i></p>
+              <p style="font-size: 25px;">Since we have the year of each publication we model the <i>learning rate</i> accordingly</p>
+              <p style="font-size: 25px;">i.e. the more recent a publication is the more influential it is on strength of connection between researchers</p>
+              <div id="learningrate"></div>
+              <p style="font-size: 15px;">(Hover the mouse over each point to see the learning rate value for each year)</p>
+        </section>
+      </section>
+
+      <section>
+        <section>
+          <h1>The data</h1>
+          <ul>
+            <li>Raw data</li>
+            <li>Preprocessing</li>
+            <li>Outputs</li>
+            <li>Data statistics</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Raw data</h2>
+          <div style="width: 100%; font-size: 20px;">
+            <div style="float: left; width: 60%;">
+              <h3>Inputs</h3>
+              <ul>
+                <li><code>staff.csv</code>
+                  <ul>
+                    <li>person ID</li>
+                    <li>published name</li>
+                    <li>association (organisational code)</li>
+                    <li>job title</li>
+                  </ul>
+                </li>
+                <li><code>authors.csv</code>
+                  <ul>
+                    <li>person ID</li>
+                    <li>publication ID</li>
+                  </ul>
+                </li>
+                <li><code>outputs.csv</code>
+                  <ul>
+                    <li>publication ID</li>
+                    <li>title</li>
+                    <li>type of publication</li>
+                    <li>publication year</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <div style="float: right; width: 40%;">
+              <h3>Information</h3>
+              <p>Basic statistics about each researcher.</p>
+              <p>University structure.</p>
+              <p>Identify how many times each pair of researchers collaborated in any particular year based on how many papers they have published&hellip;</p>
+              <p>&hellip;identify the strength of internal and external connections between academic units of particular type (e.g. schools or faculties).</p>
+              <p>Model similarities between papers (similar titles), hence identify potential collaborations.</p>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2>Preprocessing</h2>
+          <div style="font-size: 20px;">
+            <ul>
+              <li> Publications:
+                <ul>
+                  <li><b>Reduce the amount of data</b> (~30k to ~8k of papers) &mdash; since we are only interested in modelling the collaborations we can remove all single authored papers.</li>
+                  <li>Assign all the authors to the corresponding publications.</li>
+                  <li>Clean, parse and tokenise free text fields (titles, abstracts, keywords) &mdash; remove unicode characters, remove stop words, get stems of all the words&hellip;</li>
+                  <li>&hellip; but unfortunately only the publication title is useful as <b>keywords are missing in 20% and abstract in 50%</b> of the dataset entries.</li>
+                </ul>
+              </li>
+            <hr>
+              <li> Authors:
+                <ul>
+                  <li>Create structured object from the <i>type of publication</i>.</li>
+                  <li>create structured object from the <i>job titles</i>.</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section>
+          <h2>Outputs</h2>
+          <br>
+          <h4>Publications</h4>
+          <table style="font-size: 14px;">
+            <tr>
+              <th>id</th>
+              <th>title</th>
+              <th>type</th>
+              <th>year</th>
+              <th>keywords</th>
+              <th>abstract</th>
+              <th>authors</th>
+            </tr>
+            <tr>
+              <td>53490655</td>
+              <td>communication as information use</td>
+              <td>(book, chapter)</td>
+              <td>2011</td>
+              <td>NaN</td>
+              <td>introduction uncertainty is an unavoidable pro...</td>
+              <td>[1968, 12503]</td>
+            </tr>
+            <tr>
+              <td>56453104</td>
+              <td>tobacco</td>
+              <td>(book, chapter)</td>
+              <td>2013</td>
+              <td>NaN</td>
+              <td>NaN</td>
+              <td>[27487, 22878]</td>
+            </tr>
+          </table>
+          <br>
+          <h4>Authors</h4>
+          <table style="font-size: 14px;">
+            <tr>
+              <th>id</th>
+              <th>forename</th>
+              <th>surname</th>
+              <th>published name</th>
+              <th>job title</th>
+              <th>organisation code</th>
+            </tr>
+            <tr>
+              <td>10925</td>
+              <td>Jamie</td>
+              <td>Jeremy</td>
+              <td>[JY Jeremy]</td>
+              <td>[(, Emeritus, , , , , , Professor, )]</td>
+              <td>[SOCS]</td>
+            </tr>
+            <tr>
+              <td>24576</td>
+              <td>Siobhan</td>
+              <td>Shilton</td>
+              <td>[SM Shilton, Siobhan M Shilton]</td>
+              <td>[(, , , , , , , Reader, ), (, , , Research, , ...</td>
+              <td>[FREN]</td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <div style="-ms-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); transform: rotate(-90deg); position: fixed; width: 100%; height: 30px; top: 50%; left: -48%;">
+            <h2>Statistics</h2>
+          </div>
+          <!--<div style="position: fixed; width: 80%; heigth: 300px; left: 10%; top: 450px;">-->
+          <div>
+            <h3>Published name</h3>
+            <div class="fragment fade-out" data-fragment-index="1" style="position: absolute; font-size: 30px; width: 80%; left: 10%; top: 200px;">
+              <ul>
+                <li>People use multiple names for their publications</li>
+                <li>There are <b>2 people</b> who are using <b>11 different</b> names, e.g.:
+                  <table style="font-size: 20px; margin-top: 30px;">
+                    <tr>
+                      <td>KME Turner</td>
+                      <td>Katy M E Turner</td>
+                      <td>Katy Turner</td>
+                      <td>K Turner</td>
+                    </tr>
+                    <tr>
+                      <td>Katherine Turner</td>
+                      <td>Katy M. E. Turner</td>
+                      <td>K.M.E. Turner</td>
+                      <td>K M E Turner</td>
+                    </tr>
+                    <tr>
+                      <td>K.M. Turner</td>
+                      <td>Katherine M E Turner</td>
+                      <td>Katherine M. E. Turner</td>
+                      <td></td>
+                    </tr>
+                  </table>
+                </li>
+              </ul>
+            </div>
+            <div class="fragment current-visible" data-fragment-index="1" style="position: absolute; width: 80%; left: 10%;">
+              <div id="publishednamebar"> </div>
+              <p style="font-size: 14px;">y-axis &mdash; number of different names used
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              x-axis &mdash; number of people using y different names</p>
+            </div>
+            <div class="fragment fade-in" data-fragment-index="2" style="position: absolute; width: 80%; left: 10%;">
+              <div id="publishednamepie"> </div>
+            </div>
+          </div>
+        </section>
+        <section>
+          <div style="-ms-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); transform: rotate(-90deg); position: fixed; width: 100%; height: 30px; top: 50%; left: -48%;">
+            <h2>Statistics</h2>
+          </div>
+          <div>
+            <div class="fragment fade-out" data-fragment-index="2" style="width: 90%; padding-left: 10%;">
+              <h2>Job titles</h2>
+              <div style="font-size: 25px; ">
+                <p>There are around <b>1426 different job titles among 3263 researchers</b>.</p>
+                <p>Some researchers have multiple job titles in the PURE record (pie-chart).</p>
+                <p>Queries such as "how many professors per department/faculty" are possible.</p>
+                <hr>
+                <div class="fragment" data-fragment-index="1">
+                  <p>The most interesting job titles of people who published:
+                    <ul>
+                      <li>Receptionist</li>
+                      <li>Bioinformatician</li>
+                      <li>Geneticist</li>
+                    </ul>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fragment fade-in" data-fragment-index="2" style="position: fixed; width: 80%; left: 10%; top: 10%;">
+            <!--<div class="fragment fade-out" data-fragment-index="2">-->
+              <h4>Number of job titles</h4>
+              <div id="jobtitles"> </div>
+            <!--</div>-->
+          </div>
+        </section>
+        <section>
+          <div style="-ms-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); transform: rotate(-90deg); position: fixed; width: 100%; height: 30px; top: 50%; left: -48%;">
+            <h2>Statistics</h2>
+          </div>
+          <div style="width: 90%; padding-left: 10%;">
+              <h2>Job titles</h2>
+                  <p style="font-size: 25px;">I reorganised the job titles into <b>9-tier hierarchy</b> (the most popular title):</p>
+                  <div style="font-size: 17px; text-align: left;">
+                    <b>Visiting (103)</b> | Postdoctoral (46) | Doctoral (5) | Faculty (3) | Undergraduate (1)<hr>
+                    <b>Senior (903)</b> | Emeritus (136) | Assistant (8)<hr>
+                    <b>Clinical (158)</b> | Data (8) | IT (7) | Technical (6) | Dental (5) | Trial (4) | Systems (4) | Centre (3) | Building (2) | Molecular (2) | Library (2) | General (2) | Team (1) | Programme (1) | HR (1) | Nursery (1) | User (1)<hr>
+                    <b>Research (1281)</b> | Teaching (137) | Scientific (4) | Training (3) | Education (2) | Experimental (1)<hr>
+                    <b>and Teaching (2)</b> | and Training (1)<hr>
+                    <b>Project (42)</b> | Laboratory (15) | Computer (2) | Study (1) | Switchboard (1)<hr>
+                    <b>Associate (717)</b><hr>
+                    <b>Lecturer (665)</b> | Fellow (625) | Professor (607) | Reader (210) | Collaborator (128) | Technician (60) | Teacher (57) | Staff (48) | Manager (42) | Consultant (31) | Chair (29) | Support (20) | Tutor (19) | Administrator (16) | Officer (16) | Director (16) | Head (15) | Demonstrator (12) | Dean (7) | Co-ordinator (7) | Assistant (6) | Council (6) | Vice-Chancellor (4) | Leader (3) | Receptionist (3) | Coordinator (3) | Supervisor (3) | Librarian (2) | Instructor (2) | Student (2) | Developer (2) | Accountant (1) | Adviser (1) | Bioinformatician (1) | Worker (1) | Geneticist (1) | Selector (1) | President (1) | Secretary (1) | Trainer (1) | Surveyor (1) | Operator (1)<hr>
+                    <b>(Research) (1)</b>
+                  </div>
+          </div>
+        </section>
+        <section>
+          <div style="-ms-transform: rotate(-90deg); -webkit-transform: rotate(-90deg); transform: rotate(-90deg); position: fixed; width: 100%; height: 30px; top: 50%; left: -48%;">
+            <h2>Statistics</h2>
+          </div>
+          <div style="width: 90%; padding-left: 10%;">
+            <h2>Multiple associations</h2>
+            <p>Some people are also associated with more than one academic unit&hellip;</p>
+            <div id="association" style="margin-top: 20px;"> </div>
+          </div>
+        </section>
+    </section>
+
+    <section>
+      <section>
+        <h1>University structure</h1>
+      </section>
+      <section>
+        <h2>Radial tree</h2>
+        <p>The university is structured hierarchically, therefore it can be modelled as a tree. Due to its size linear trees are not comprehensible but radial trees are.</p>
+        <p>The structure is encoded as a nested JSON file:</p>
+        <pre>
+          {
+            "name": "...",
+            "short_name": "...",
+            "full_nume": "...",
+            "url": "...",
+            "type": "...",
+            "people": ["...", "..."],
+            "children": [{...}, {...}]
+          }
+        </pre>
+      </section>
+      <section>
+        <h4 class="fragment fade-out" data-fragment-index="1" style="width: 100%; position: fixed; top: 0; margin-top: 25%;">University of Bristol</h4>
+        <div class="fragment fade-in" data-fragment-index="1" style="width: 100%; position: fixed; top: 15px;"><div id="university" class="view"></div></div>
+      </section>
+      <section>
+        <h4 class="fragment fade-out" data-fragment-index="1" style="width: 100%; position: fixed; top: 0; margin-top: 25%;">Academic units at the University of Bristol</h4>
+        <div class="fragment fade-in" data-fragment-index="1" style="width: 100%; position: fixed; top: 15px;"><div id="acad" class="view"></div></div>
+      </section>
+    </section>
+
+    <section>
+      <section>
+        <h1>Publications</h1>
+        <h2><em>descriptive</em> modeling</h2>
+      </section>
+      <section>
+        <div style="font-size: 25px;">
+          <p>Since we model interactions between researchers we consider papers published by more than one author.</p>
+          <p>We take the year of publication into account &mdash; the more recent the publication is the more it contributes to connection between academic units.</p>
+          <p>We present results for each year separately and through the whole period 2008&mdash;2013.
+          <p>We model the interactions on both <b>school</b> and <b>faculty</b> level.</p>
+          We present two results for faculty interactions:
+          <ul>
+            <li></i>raw</i> &mdash; concatenate scores for academic units in a faculty.</li>
+            <li></i>normalisation</i> &mdash; as above but account for the number of academic units per faculty.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Faculty connections</h5>
+        </div>
+        <div class="fragment fade-out" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th>year</th>
+              <th colspan="3">Internal connection</th>
+            </tr>
+            <tr>
+              <td>2008</td>
+              <td>FSCI</td>
+              <td>FMDY</td>
+              <td>FMVS</td>
+            </tr>
+            <tr>
+              <td>2009</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>2010</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>2011</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>2012</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FMVS</td>
+            </tr>
+            <tr>
+              <td>2013</td>
+              <td>FSCI</td>
+              <td>FMDY</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>total</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FSSL</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment current-visible" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th colspan="2"></th>
+              <th>REST</th>
+              <th>FENG</th>
+              <th>FMDY</th>
+              <th>FSCI</th>
+              <th>FOAT</th>
+              <th>INST</th>
+              <th>FMVS</th>
+              <th>FSSL</th>
+            </tr>
+            <tr>
+              <td rowspan="3">Total external connection</td>
+              <td>1st</td>
+              <td>FENG</td>
+              <td>FENG</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FOAT</td>
+              <td>FMDY</td>
+              <td>FMVS</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>2nd</td>
+              <td>FSCI</td>
+              <td>FOAT</td>
+              <td>FMVS</td>
+              <td>FOAT</td>
+              <td>FSCI</td>
+              <td>FSSL</td>
+              <td>FMDY</td>
+              <td>FMDY</td>
+            </tr>
+            <tr>
+              <td>3rd</td>
+              <td>FSSL</td>
+              <td>FMVS</td>
+              <td>FSCI</td>
+              <td>FMDY</td>
+              <td>FENG</td>
+              <td>FMVS</td>
+              <td>FENG</td>
+              <td>FSCI</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 100px; height: 50px; position: fixed; right: 0; top: 0; font-size: 30px;">
+          <a href="chord_fac.html?years=total" target="_blank">plot</a>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 960px; height: 700px; position: fixed; left: 0; top: 5%;">
+          <iframe src="chord_fac.html?years=total" width="100%" height="100%" scrolling="no" style="margin-top: -0%;"></iframe>
+        </div>
+      </section>
+
+      <section>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Faculty connections (normalised)</h5>
+        </div>
+
+        <div class="fragment fade-out" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th>year</th>
+              <th colspan="3">Internal connection</th>
+            </tr>
+            <tr>
+              <td>2008</td>
+              <td>FMVS</td>
+              <td>FSSL</td>
+              <td>FMDY</td>
+            </tr>
+            <tr>
+              <td>2009</td>
+              <td>FMDY</td>
+              <td>FSSL</td>
+              <td>FMVS</td>
+            </tr>
+            <tr>
+              <td>2010</td>
+              <td>FMDY</td>
+              <td>FSSL</td>
+              <td>FENG</td>
+            </tr>
+            <tr>
+              <td>2011</td>
+              <td>FMDY</td>
+              <td>FSSL</td>
+              <td>FMVS</td>
+            </tr>
+            <tr>
+              <td>2012</td>
+              <td>FMVS</td>
+              <td>FMDY</td>
+              <td>FENG</td>
+            </tr>
+            <tr>
+              <td>2013</td>
+              <td>FSSL</td>
+              <td>FENG</td>
+              <td>FMDY<br></td>
+            </tr>
+            <tr>
+              <td>total</td>
+              <td>FMDY</td>
+              <td>FSSL</td>
+              <td>FMVS</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment current-visible" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th colspan="2"></th>
+              <th>REST</th>
+              <th>FENG</th>
+              <th>FMDY</th>
+              <th>FSCI</th>
+              <th>FOAT</th>
+              <th>INST</th>
+              <th>FMVS</th>
+              <th>FSSL</th>
+            </tr>
+            <tr>
+              <td rowspan="3">Total<br>external<br>connection</td>
+              <td>1st</td>
+              <td>FENG</td>
+              <td>FENG</td>
+              <td>FMDY</td>
+              <td>FSCI</td>
+              <td>FOAT</td>
+              <td>FMDY</td>
+              <td>FMVS</td>
+              <td>FSSL</td>
+            </tr>
+            <tr>
+              <td>2nd</td>
+              <td>REST</td>
+              <td>REST</td>
+              <td>FMVS</td>
+              <td>REST</td>
+              <td>FENG</td>
+              <td>FSSL</td>
+              <td>FMDY</td>
+              <td>REST</td>
+            </tr>
+            <tr>
+              <td>3rd</td>
+              <td>FSCI</td>
+              <td>FOAT</td>
+              <td>INST</td>
+              <td>FOAT</td>
+              <td>FSCI</td>
+              <td>FMVS</td>
+              <td>FENG</td>
+              <td>FMDY</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 100px; height: 50px; position: fixed; right: 0; top: 0; font-size: 30px;">
+          <a href="chord_fac_norm.html?years=total" target="_blank">plot</a>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 960px; height: 700px; position: fixed; left: 0; top: 5%;">
+          <iframe src="chord_fac_norm.html?years=total" width="100%" height="100%" scrolling="no" style="margin-top: -0%;"></iframe>
+        </div>
+      </section>
+
+      <section>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Schools connections</h5>
+        </div>
+
+        <div class="fragment fade-out" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th>year</th>
+              <th colspan="3">Internal connection</th>
+            </tr>
+            <tr>
+              <td>2008</td>
+              <td>MVFS (0.04)</td>
+              <td>CHSE (0.03)</td>
+              <td>LAWD (0.02)</td>
+            </tr>
+            <tr>
+              <td>2009</td>
+              <td>CHSE (0.06)</td>
+              <td>PSYC (0.03)</td>
+              <td>MODL (0.03)</td>
+            </tr>
+            <tr>
+              <td>2010</td>
+              <td>CHSE (0.08)</td>
+              <td>PSYC (0.03)</td>
+              <td>SPOL (0.03)</td>
+            </tr>
+            <tr>
+              <td>2011</td>
+              <td>CHSE (0.05)</td>
+              <td>MVSF (0.04)</td>
+              <td>PSYC (0.03)</td>
+            </tr>
+            <tr>
+              <td>2012</td>
+              <td>MVSF (0.08)</td>
+              <td>CHSE (0.05)</td>
+              <td>PSYC (0.03)</td>
+            </tr>
+            <tr>
+              <td>2013</td>
+              <td>CHSE (0.05)</td>
+              <td>MODL (0.04)</td>
+              <td>PSYC (0.04)</td>
+            </tr>
+            <tr>
+              <td>total</td>
+              <td>CHSE (0.31)</td>
+              <td>PSYC (0.20)</td>
+              <td>MVSF (0.15)</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment current-visible" data-fragment-index="1" style="position: absolute; font-size: 14px; width: 100%;">
+          <table>
+            <tr>
+              <th colspan="2"></th>
+              <th>INOV</th>
+              <th>CABI</th>
+              <th>MVSF</th>
+              <th>ENGF</th>
+              <th>VESC</th>
+              <th>PSYC</th>
+              <th>CHEM</th>
+              <th>LANG</th>
+              <th>BIOC</th>
+              <th>EDUC</th>
+              <th>PHPH</th>
+              <th>LAWD</th>
+              <th>HUMS</th>
+              <th>&hellip;</th>
+            </tr>
+            <tr>
+              <td rowspan="3">Total<br>external<br>connection</td>
+              <td>1st</td>
+              <td>MVEN</td>
+              <td>SSCM</td>
+              <td>BIOC</td>
+              <td>MVEN</td>
+              <td>CHSE</td>
+              <td>INOV</td>
+              <td>SCIF</td>
+              <td>SOCS</td>
+              <td>MVSF</td>
+              <td>ENGF</td>
+              <td>MVSF</td>
+              <td>SPOL</td>
+              <td>SART</td>
+              <td>&hellip;</td>
+            </tr>
+            <tr>
+              <td>2nd</td>
+              <td>PSYC</td>
+              <td></td>
+              <td>PHPH</td>
+              <td>MSAD</td>
+              <td>EDUC</td>
+              <td>SSCM</td>
+              <td>REST</td>
+              <td></td>
+              <td>PHPH</td>
+              <td>VESC</td>
+              <td>BIOC</td>
+              <td>EFIM</td>
+              <td>SPAI</td>
+              <td>&hellip;</td>
+            </tr>
+            <tr>
+              <td>3rd</td>
+              <td>QUEN</td>
+              <td></td>
+              <td>PANM</td>
+              <td>QUEN</td>
+              <td>BISC</td>
+              <td>BISC</td>
+              <td>MODL</td>
+              <td></td>
+              <td>PANM</td>
+              <td>MEED</td>
+              <td>SOCS</td>
+              <td>ORDS</td>
+              <td>MEED</td>
+              <td>&hellip;</td>
+            </tr>
+          </table>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 100px; height: 50px; position: fixed; right: 0; top: 0; font-size: 30px;">
+          <a href="chord_sch.html?years=total" target="_blank">plot</a>
+        </div>
+        <div class="fragment fade-in" data-fragment-index="2" style="width: 960px; height: 700px; position: fixed; left: 0; top: 5%;">
+          <iframe src="chord_sch.html?years=total" width="100%" height="100%" scrolling="no" style="margin-top: -0%;"></iframe>
+        </div>
+      </section>
+
+      <section>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Network analysis</h5>
+        </div>
+        <div style="font-size: 24px;">
+          <p>Network analysis is also possible but the network itself is difficult to visualise because of small differences in the connection strength.</p>
+          <p>The importance of each node in the network can be expressed by its <i>centrality</i>:</p>
+          <ul>
+            <li>Closeness &mdash; sum of the shortest paths between the node and all the other nodes, which in <i>schools connections</i> plot shows as the most connections to other academic units;</li>
+            <li>Betweenness &mdash; is based on the number of shortest paths between each pair of vertices passing through the vertex, which in <i>schools connections</i> plot shows again as the most connections to other academic units;</li>
+            <li>Eigenvector &mdash; is based on the number of connections to important vertices, which in <i>schools connections</i> plot shows as strong connection between ORDS and MDYF and then any node strongly connected to either one of them</li>
+          </ul>
+        </div>
+        <div style="font-size: 14px;">
+          <p style="text-align: left; margin-left: 100px; font-size: 30px;"><b>Centrality:</b></p>
+          <table>
+            <tr>
+              <th>Closeness</th>
+              <td>SOCS (0.80)</td>
+              <td>SSCM (0.76)</td>
+              <td>CHEM (0.70)</td>
+              <td>QUEN (0.69)</td>
+              <td>&hellip;</td>
+              <td>MODL (0.41)</td>
+              <td>GSEN (0.41)</td>
+              <td>NSQI (0.39)</td>
+            </tr>
+            <tr>
+              <th>Betweenness</th>
+              <td>SSCM (0.14)</td>
+              <td>SOCS (0.13)</td>
+              <td>CHEM (0.12)</td>
+              <td>QUEN (0.09)</td>
+              <td>&hellip;</td>
+              <td>LANG (0.00)</td>
+              <td>CABI (0.00)</td>
+              <td>INOV (0.00)</td>
+            </tr>
+            <tr>
+              <th>Eigenvector</th>
+              <td>ORDS (0.68)</td>
+              <td>MDYF (0.59)</td>
+              <td>CHSE (0.40)</td>
+              <td>SSCM (0.08)</td>
+              <td>&hellip;</td>
+              <td>GSEN (0.00)</td>
+              <td>LANG (0.00)</td>
+              <td>MODL (0.00)</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Hierarchical clustering</h5>
+        </div>
+        <div style="font-size: 24px;">
+          <p>Classical clustering gives meaningless results on this data.</p>
+          <p>On the other hand, <b>hierarchical clustering</b> produces somehow meaningful results<br>(the data are thresholded by the school connection strength).</p>
+          <p>Depending how you cut this tree structure vertically you can receive different clusterings.</p>
+        <div>
+        <div id="dendrogram"></div>
+      </section>
+    </section>
+
+    <section>
+      <section>
+        <h1>Publications</h1>
+        <h2> <em>predictive</em> modelling</h2>
+      </section>
+      <section>
+        <p>To discover possible collaborations between schools we model similarities between publication titles.</p>
+        <p>We do this with <b>tf-idf</b> and <b>cosine distance</b> therefore we can find similar papers and get their similarity score.</p>
+        <p>We threshold these (0.25) to get only relevant papers and then build connections between academic units based on authors associations.</p>
+      </section>
+      <section>
+        <div style="width: 960px; height: 700px; position: fixed; left: 0; top: 30px;">
+          <iframe src="chord_col.html" width="100%" height="100%" scrolling="no" style="margin-top: -0%;"></iframe>
+        </div>
+        <div style="width: 600px; height: 50px; position: fixed; left: 0; top: 0; font-size: 30px; text-align: left;">
+          <h5>Possible collaborations</h5>
+        </div>
+        <div style="width: 100px; height: 50px; position: fixed; right: 0; top: 0; font-size: 30px;">
+          <a href="chord_col.html" target="_blank">plot</a>
+        </div>
+      </section>
+    </section>
+
+    <section>
+      <section>
+      <h1>Possible extensions</h1>
+      </section>
+      <section>
+        <ul>
+          <li>With more data our association matrix would better model interactions between individuals and academic units (better clustering).</li>
+          <li>Use keywords and abstracts to model similarities between publications, hence discover potential collaborations.</li>
+          <li>Improve visualisations and make them more interactive.</li>
+        </ul>
+      </section>
+    </section>
+
+    <section>
+      <div style="width: 960px; top: 0px; margin: auto;">
+        <h1 style="font-size: 250px;">Uo<img style="vertical-align: middle;" src="img/hbrain.png">rain</h1>
+      </div>
+      <div style="width: 960px; bottom: 0em; font-size: 30px;">
+          Kacper Sokol
+     </div>
+      <div style="width: 960px; bottom: 0em; font-size: 20px;">
+          (Acknowledgments: Miquel Perello Nieto, Peter Flach)
+     </div>
+    </section>
+
+      </div>
+    </div>
+
+    <script>
+      Reveal.initialize({
+        width: 960,
+        height: 700,
+        center: true,
+
+        controls: true,
+        progress: true,
+        history: true,
+        overview: true,
+
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+        transitionSpeed: 'default', // default/fast/slow
+        backgroundTransition: 'convex' // none/fade/slide/convex/concave/zoom
+      });
+    </script>
+
+    <!--learningrate-->
+    <script>
+      var vegaJSONSpec = {
+          "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+          "width": 700,
+          "height": 200,
+          "padding": 10,
+
+          "data": [
+            {
+              "name": "table",
+              "url": "data/learning_rate.csv",
+              "format": {"type": "csv"}
+            }
+          ],
+
+          "signals": [
+            {
+              "name": "tooltip",
+              "value": {},
+              "on": [
+                {"events": "symbol:mouseover", "update": "datum"},
+                {"events": "symbol:mouseout",  "update": "{}"}
+              ]
+            }
+          ],
+
+          "scales": [
+            {
+              "name": "x",
+              "type": "point",
+              "range": "width",
+              "domain": {"data": "table", "field": "year"}
+            },
+            {
+              "name": "y",
+              "type": "linear",
+              "range": "height",
+              "nice": true,
+              "zero": true,
+              "domain": {"data": "table", "field": "lr"}
+            },
+            {
+              "name": "color",
+              "type": "ordinal",
+              "range": "category",
+              "domain": {"data": "table", "field": "colour"}
+            }
+          ],
+
+          "axes": [
+            {"orient": "bottom", "scale": "x"},
+            {"orient": "left", "scale": "y", "offset": 8}
+          ],
+
+          "marks": [
+            {
+                  "type": "line",
+                  "from": {"data": "table"},
+                  "encode": {
+                    "enter": {
+                      "x": {"scale": "x", "field": "year"},
+                      "y": {"scale": "y", "field": "lr"},
+                      "stroke": {"value": "orange"},
+                      "strokeWidth": {"value": 2}
+                    },
+                    "update": {
+                      "interpolate": "monotone"
+                    }
+                  }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"scale": "x", "field": "year"},
+                  "y": {"scale": "y", "field": "lr"},
+                  "stroke": {"scale": "color", "field": "colour"},
+                  "fill": {"scale": "color", "field": "colour"}
+                },
+                "update": {
+                  "fill": {"scale": "color", "field": "colour"}
+                },
+                "hover": {
+                  "fill": {"value": "red"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "encode": {
+                "enter": {
+                  "align": {"value": "center"},
+                  "baseline": {"value": "bottom"},
+                  "fill": {"value": "#333"}
+                },
+                "update": {
+                  "x": {"scale": "x", "signal": "tooltip.year", "band": 0.9},
+                  "y": {"scale": "y", "signal": "tooltip.lr", "offset": -5},
+                  "text": {"signal": "tooltip.lr"},
+                  "fillOpacity": [
+                    {"test": "datum === tooltip", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#learningrate') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <!-- publishedname -->
+    <script>
+      var vegaJSONSpec = {
+        "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+        "width": 775,
+        "height": 450,
+        "padding": 15,
+
+        "data": [
+          {
+            "name": "table",
+            "url": "data/published_name.csv",
+            "format": {"type": "csv"}
+          }
+        ],
+
+        "signals": [
+          {
+            "name": "tooltip",
+            "value": {},
+            "on": [
+              {"events": "rect:mouseover", "update": "datum"},
+              {"events": "rect:mouseout",  "update": "{}"}
+            ]
+          }
+        ],
+
+        "scales": [
+          {
+            "name": "x",
+            "type": "linear",
+            "domain": {"data": "table", "field": "counts"},
+            "nice": true,
+            "domainMax": 1200,
+            "range": "width"
+          },
+          {
+            "name": "y",
+            "type": "band",
+            "domain": {"data": "table", "field": "quantity"},
+            "range": "height",
+            "reverse": true
+          }
+        ],
+
+        "axes": [
+          { "orient": "bottom", "scale": "x" },
+          { "orient": "left", "scale": "y" }
+        ],
+
+        "marks": [
+          {
+            "type": "rect",
+            "from": {"data":"table"},
+            "encode": {
+              "enter": {
+                "x": {"scale": "x", "value": 0},
+                "x2": {"scale": "x", "field": "counts"},
+                "y": {"scale": "y", "field": "quantity", "offset": 1},
+                "height": {"scale": "y", "band": 1, "offset": -1}
+              },
+              "update": {
+                "fill": {"value": "steelblue"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "align": {"value": "left"},
+                "baseline": {"value": "middle"},
+                "fontSize": {"value": 20},
+                "fill": {"value": "#333"}
+              },
+              "update": {
+                "x": {"scale": "x", "signal": "tooltip.counts", "offset": 5},
+                "y": {"scale": "y", "signal": "tooltip.quantity", "band": 0.5},
+                "text": {"signal": "tooltip.counts"},
+                "fillOpacity": [
+                  {"test": "datum === tooltip", "value": 0},
+                  {"value": 1}
+                ]
+              }
+            }
+          }
+        ]
+      };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')              // set renderer (canvas or svg)
+        .initialize('#publishednamebar') // initialize view within parent DOM container
+        .hover()                      // enable hover encode set processing
+      .run();                       // run the dataflow and render the view
+    </script>
+
+    <!--publishednamepie-->
+    <script>
+      var vegaJSONSpec = {
+          "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+          "width": 565,
+          "height": 565,
+          "padding": 20,
+          "autosize": "none",
+
+          "data": [
+            {
+              "name": "table",
+              "url": "data/published_name.csv",
+              "format": {"type": "csv"},
+              "transform": [
+                {
+                  "type": "pie",
+                  "field": "counts",
+                }
+              ]
+            }
+          ],
+
+          "scales": [
+            {
+              "name": "color",
+              "type": "ordinal",
+              "range": {"scheme": "category20"}
+            },
+            {
+              "name": "r",
+              "type": "sqrt",
+              "domain": {"data": "table", "field": "quantity"},
+              "zero": true,
+              "range": [10, 210]
+            }
+          ],
+
+          "signals": [
+            {
+              "name": "tooltip",
+              "value": {},
+              "on": [
+                {"events": "arc:mouseover", "update": "datum"},
+                {"events": "arc:mouseout",  "update": "{}"}
+              ]
+            }
+          ],
+
+          "marks": [
+            {
+              "type": "arc",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"signal": "width / 2"},
+                  "y": {"signal": "height / 2"},
+                  "startAngle": {"field": "startAngle"},
+                  "endAngle": {"field": "endAngle"},
+                  "innerRadius": {"value": 0},
+                  "outerRadius": {"signal": "width / 2"},
+                  "cornerRadius": {"value": 5}
+                },
+                "update": {
+                  "fill": {"scale": "color", "field": "_id"}
+                },
+                "hover": {
+                  "fill": {"value": "pink"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"scale": "r", "field": "quantity", "offset": 8},
+                  // "radius": {"signal": "width / 4"},
+                  "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                  "text": {"field": "quantity"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"signal": "width / 2 + 10"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                },
+                "update": {
+                  "theta": {"signal": "(tooltip.startAngle + tooltip.endAngle)/2"},
+                  "text": {"signal": "tooltip.counts"},
+                  "fillOpacity": [
+                    {"test": "datum === tooltip", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#publishednamepie') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <!--jobtitles-->
+    <script>
+      var vegaJSONSpec = {
+          "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+          "width": 525,
+          "height": 525,
+          "padding": 20,
+          "autosize": "none",
+
+          "data": [
+            {
+              "name": "table",
+              "url": "data/job_titles.csv",
+              "format": {"type": "csv"},
+              "transform": [
+                {
+                  "type": "pie",
+                  "field": "counts",
+                }
+              ]
+            }
+          ],
+
+          "scales": [
+            {
+              "name": "color",
+              "type": "ordinal",
+              "range": {"scheme": "category20"}
+            },
+            {
+              "name": "r",
+              "type": "sqrt",
+              "domain": {"data": "table", "field": "titles"},
+              "zero": true,
+              "range": [10, 210]
+            }
+          ],
+
+          "signals": [
+            {
+              "name": "tooltip",
+              "value": {},
+              "on": [
+                {"events": "arc:mouseover", "update": "datum"},
+                {"events": "arc:mouseout",  "update": "{}"}
+              ]
+            }
+          ],
+
+          "marks": [
+            {
+              "type": "arc",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"signal": "width / 2"},
+                  "y": {"signal": "height / 2"},
+                  "startAngle": {"field": "startAngle"},
+                  "endAngle": {"field": "endAngle"},
+                  "innerRadius": {"value": 0},
+                  "outerRadius": {"signal": "width / 2"},
+                  "cornerRadius": {"value": 5}
+                },
+                "update": {
+                  "fill": {"scale": "color", "field": "_id"}
+                },
+                "hover": {
+                  "fill": {"value": "pink"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"scale": "r", "field": "titles", "offset": 8},
+                  // "radius": {"signal": "width / 4"},
+                  "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                  "text": {"field": "titles"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"signal": "width / 2 + 10"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                },
+                "update": {
+                  "theta": {"signal": "(tooltip.startAngle + tooltip.endAngle)/2"},
+                  "text": {"signal": "tooltip.counts"},
+                  "fillOpacity": [
+                    {"test": "datum === tooltip", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#jobtitles') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <!--association-->
+    <script>
+      var vegaJSONSpec = {
+          "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+          "width": 400,
+          "height": 400,
+          "padding": 20,
+          "autosize": "none",
+
+          "data": [
+            {
+              "name": "table",
+              "url": "data/associations.csv",
+              "format": {"type": "csv"},
+              "transform": [
+                {
+                  "type": "pie",
+                  "field": "counts",
+                }
+              ]
+            }
+          ],
+
+          "scales": [
+            {
+              "name": "color",
+              "type": "ordinal",
+              "range": {"scheme": "category20"}
+            },
+            {
+              "name": "r",
+              "type": "sqrt",
+              "domain": {"data": "table", "field": "associations"},
+              "zero": true,
+              "range": [10, 160]
+            }
+          ],
+
+          "signals": [
+            {
+              "name": "tooltip",
+              "value": {},
+              "on": [
+                {"events": "arc:mouseover", "update": "datum"},
+                {"events": "arc:mouseout",  "update": "{}"}
+              ]
+            }
+          ],
+
+          "marks": [
+            {
+              "type": "arc",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"signal": "width / 2"},
+                  "y": {"signal": "height / 2"},
+                  "startAngle": {"field": "startAngle"},
+                  "endAngle": {"field": "endAngle"},
+                  "innerRadius": {"value": 0},
+                  "outerRadius": {"signal": "width / 2"},
+                  "cornerRadius": {"value": 5}
+                },
+                "update": {
+                  "fill": {"scale": "color", "field": "_id"}
+                },
+                "hover": {
+                  "fill": {"value": "pink"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"scale": "r", "field": "associations", "offset": 8},
+                  // "radius": {"signal": "width / 4"},
+                  "theta": {"signal": "(datum.startAngle + datum.endAngle)/2"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                  "text": {"field": "associations"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "table"},
+              "encode": {
+                "enter": {
+                  "x": {"field": {"group": "width"}, "mult": 0.5},
+                  "y": {"field": {"group": "height"}, "mult": 0.5},
+                  "radius": {"signal": "width / 2 + 10"},
+                  "fill": {"value": "#000"},
+                  "align": {"value": "center"},
+                  "baseline": {"value": "middle"},
+                  "fontSize": {"value": 20},
+                },
+                "update": {
+                  "theta": {"signal": "(tooltip.startAngle + tooltip.endAngle)/2"},
+                  "text": {"signal": "tooltip.counts"},
+                  "fillOpacity": [
+                    {"test": "datum === tooltip", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#association') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <!--university-->
+    <script>
+      var vegaJSONSpec = {
+        "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+        "width": 700,
+        "height": 700,
+        "padding": 5,
+        "autosize": "none",
+
+        "signals": [
+          {
+            "name": "labels", "value": true,
+            "bind": {"input": "checkbox"}
+          },
+          {
+            "name": "layout", "value": "tidy",
+            "bind": {"input": "radio", "options": ["tidy", "cluster"]}
+          },
+          {
+            "name": "radius", "value": 320,
+            "bind": {"input": "range", "min": 20, "max": 600}
+          },
+          { "name": "originX", "update": "width / 2" },
+          { "name": "originY", "update": "height / 2" },
+          {
+            "name": "tooltip",
+            "value": {},
+            "on": [
+              {"events": "symbol:mouseover", "update": "datum"},
+              {"events": "symbol:mouseout",  "update": "{}"}
+            ]
+          }
+        ],
+
+        "data": [
+          {
+            "name": "tree",
+            "url": "data/uni_tree.json",
+            "transform": [
+              {
+                "type": "stratify",
+                "key": "id",
+                "parentKey": "parent"
+              },
+              {
+                "type": "tree",
+                "method": {"signal": "layout"},
+                "size": [1, {"signal": "radius"}],
+                "as": ["alpha", "radius", "depth", "children"]
+              },
+              {
+                "type": "formula",
+                "expr": "(240 + 360 * datum.alpha + 270) % 360",
+                "as":   "angle"
+              },
+              {
+                "type": "formula",
+                "expr": "PI * datum.angle / 180",
+                "as":   "radians"
+              },
+              {
+                "type": "formula",
+                "expr": "inrange(datum.angle, [90, 270])",
+                "as":   "leftside"
+              },
+              {
+                "type": "formula",
+                "expr": "originX + datum.radius * cos(datum.radians)",
+                "as":   "x"
+              },
+              {
+                "type": "formula",
+                "expr": "originY + datum.radius * sin(datum.radians)",
+                "as":   "y"
+              }
+            ]
+          },
+          {
+            "name": "links",
+            "source": "tree",
+            "transform": [
+              { "type": "treelinks", "key": "id" },
+              {
+                "type": "linkpath",
+                "shape": "diagonal", "orient": "radial",
+                "sourceX": "source.radians", "sourceY": "source.radius",
+                "targetX": "target.radians", "targetY": "target.radius"
+              }
+            ]
+          }
+        ],
+
+        "scales": [
+          {
+            "name": "color",
+            "type": "sequential",
+            "range": {"scheme": "magma"},
+            "domain": {"data": "tree", "field": "depth"},
+            "zero": true
+          }
+        ],
+
+        "marks": [
+          {
+            "type": "path",
+            "from": {"data": "links"},
+            "encode": {
+              "update": {
+                "x": {"signal": "originX"},
+                "y": {"signal": "originY"},
+                "path": {"field": "path"},
+                "stroke": {"value": "#ccc"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "from": {"data": "tree"},
+            "encode": {
+              "enter": {
+                "size": {"value": 100},
+                "stroke": {"value": "#fff"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "fill": {"scale": "color", "field": "depth"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "from": {"data": "tree"},
+            "encode": {
+              "enter": {
+                "text": {"field": "name"},
+                "fontSize": {"value": 9},
+                "baseline": {"value": "middle"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "dx": {"signal": "(datum.leftside ? -1 : 1) * 6"},
+                "angle": {"signal": "datum.leftside ? datum.angle - 180 : datum.angle"},
+                "align": {"signal": "datum.leftside ? 'right' : 'left'"},
+                "opacity": {"signal": "labels ? 1 : 0"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "baseline": {"value": "bottom"},
+//                "fill": {"value": "red"},
+//                "stroke": {"value": "black"}
+                "font": {"value": "monospace"},
+                "fontSize": {"value": 17},
+              },
+              "update": {
+                "align": {"value": "left"},
+                "x": {"value": 10},
+                "y": {"value": 10},
+                "text": {"signal": "tooltip.description"},
+                "fillOpacity": [
+                  {"test": "datum === tooltip", "value": 0},
+                  {"value": 1}
+                ]
+              }
+            }
+          }
+        ]
+      };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#university') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <!--acad-->
+    <script>
+      var vegaJSONSpec = {
+        "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+        "width": 700,
+        "height": 700,
+        "padding": 5,
+        "autosize": "none",
+
+        "signals": [
+          {
+            "name": "labels", "value": true,
+            "bind": {"input": "checkbox"}
+          },
+          {
+            "name": "layout", "value": "tidy",
+            "bind": {"input": "radio", "options": ["tidy", "cluster"]}
+          },
+          {
+            "name": "radius", "value": 360,
+            "bind": {"input": "range", "min": 20, "max": 600}
+          },
+          { "name": "originX", "update": "width / 2" },
+          { "name": "originY", "update": "height / 2" },
+          {
+            "name": "tooltip",
+            "value": {},
+            "on": [
+              {"events": "symbol:mouseover", "update": "datum"},
+              {"events": "symbol:mouseout",  "update": "{}"}
+            ]
+          }
+        ],
+
+        "data": [
+          {
+            "name": "tree",
+            "url": "data/acad_tree.json",
+            "transform": [
+              {
+                "type": "stratify",
+                "key": "id",
+                "parentKey": "parent"
+              },
+              {
+                "type": "tree",
+                "method": {"signal": "layout"},
+                "size": [1, {"signal": "radius"}],
+                "as": ["alpha", "radius", "depth", "children"]
+              },
+              {
+                "type": "formula",
+                "expr": "(300 + 360 * datum.alpha + 270) % 360",
+                "as":   "angle"
+              },
+              {
+                "type": "formula",
+                "expr": "PI * datum.angle / 180",
+                "as":   "radians"
+              },
+              {
+                "type": "formula",
+                "expr": "inrange(datum.angle, [90, 270])",
+                "as":   "leftside"
+              },
+              {
+                "type": "formula",
+                "expr": "originX + datum.radius * cos(datum.radians)",
+                "as":   "x"
+              },
+              {
+                "type": "formula",
+                "expr": "originY + datum.radius * sin(datum.radians)",
+                "as":   "y"
+              }
+            ]
+          },
+          {
+            "name": "links",
+            "source": "tree",
+            "transform": [
+              { "type": "treelinks", "key": "id" },
+              {
+                "type": "linkpath",
+                "shape": "diagonal", "orient": "radial",
+                "sourceX": "source.radians", "sourceY": "source.radius",
+                "targetX": "target.radians", "targetY": "target.radius"
+              }
+            ]
+          }
+        ],
+
+        "scales": [
+          {
+            "name": "color",
+            "type": "sequential",
+            "range": {"scheme": "magma"},
+            "domain": {"data": "tree", "field": "depth"},
+            "zero": true
+          }
+        ],
+
+        "marks": [
+          {
+            "type": "path",
+            "from": {"data": "links"},
+            "encode": {
+              "update": {
+                "x": {"signal": "originX"},
+                "y": {"signal": "originY"},
+                "path": {"field": "path"},
+                "stroke": {"value": "#ccc"}
+              }
+            }
+          },
+          {
+            "type": "symbol",
+            "from": {"data": "tree"},
+            "encode": {
+              "enter": {
+                "size": {"value": 100},
+                "stroke": {"value": "#fff"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "fill": {"scale": "color", "field": "depth"}
+              },
+              "hover": {
+                "fill": {"value": "red"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "from": {"data": "tree"},
+            "encode": {
+              "enter": {
+                "text": {"field": "name"},
+                "fontSize": {"value": 9},
+                "baseline": {"value": "middle"}
+              },
+              "update": {
+                "x": {"field": "x"},
+                "y": {"field": "y"},
+                "dx": {"signal": "(datum.leftside ? -1 : 1) * 6"},
+                "angle": {"signal": "datum.leftside ? datum.angle - 180 : datum.angle"},
+                "align": {"signal": "datum.leftside ? 'right' : 'left'"},
+                "opacity": {"signal": "labels ? 1 : 0"}
+              }
+            }
+          },
+          {
+            "type": "text",
+            "encode": {
+              "enter": {
+                "baseline": {"value": "bottom"},
+//                "fill": {"value": "black"},
+                "font": {"value": "monospace"},
+                "fontSize": {"value": 17},
+//                "stroke": {"value": "black"}
+              },
+              "update": {
+                "align": {"value": "left"},
+                "x": {"value": 10},
+                "y": {"value": 10},
+                "text": {"signal": "tooltip.description"},
+                "fillOpacity": [
+                  {"test": "datum === tooltip", "value": 0},
+                  {"value": 1}
+                ]
+              }
+            }
+          }
+        ]
+      };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#acad') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+
+    <script>
+      var vegaJSONSpec = {
+          "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+          "width": 500,
+          "height": 500,
+          "padding": 5,
+
+          "signals": [
+            {
+              "name": "tooltip",
+              "value": {},
+              "on": [
+                {"events": "symbol:mouseover", "update": "datum"},
+                {"events": "symbol:mouseout",  "update": "{}"}
+              ]
+            }
+          ],
+
+          "data": [
+            {
+              "name": "tree",
+              "url": "data/hier_clust.json",
+              "transform": [
+                {
+                  "type": "stratify",
+                  "key": "id",
+                  "parentKey": "parent"
+                },
+                {
+                  "type": "tree",
+                  "method": "cluster",
+                  "size": [{"signal": "height"}, {"signal": "width - 100"}],
+                  "as": ["y", "x", "depth", "children"]
+                }
+              ]
+            },
+            {
+              "name": "links",
+              "source": "tree",
+              "transform": [
+                { "type": "treelinks", "key": "id" },
+                {
+                  "type": "linkpath",
+                  "orient": "horizontal",
+                  "shape": "orthogonal"
+                }
+              ]
+            }
+          ],
+
+          "scales": [
+            {
+              "name": "color",
+              "type": "sequential",
+              "range": {"scheme": "magma"},
+              "domain": {"data": "tree", "field": "depth"},
+              "zero": true
+            }
+          ],
+
+          "marks": [
+            {
+              "type": "path",
+              "from": {"data": "links"},
+              "encode": {
+                "update": {
+                  "path": {"field": "path"},
+                  "stroke": {"value": "#ccc"}
+                }
+              }
+            },
+            {
+              "type": "symbol",
+              "from": {"data": "tree"},
+              "encode": {
+                "enter": {
+                  "size": {"value": 100},
+                  "stroke": {"value": "#fff"}
+                },
+                "update": {
+                  "x": {"field": "x"},
+                  "y": {"field": "y"},
+                  "fill": {"scale": "color", "field": "depth"}
+                },
+                "hover": {
+                  "fill": {"value": "green"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "from": {"data": "tree"},
+              "encode": {
+                "enter": {
+                  "text": {"field": "name"},
+                  "fontSize": {"value": 9},
+                  "baseline": {"value": "middle"}
+                },
+                "update": {
+                  "x": {"field": "x"},
+                  "y": {"field": "y"},
+                  "dx": {"signal": "datum.children ? -7 : 7"},
+                  "align": {"signal": "datum.children ? 'right' : 'left'"}
+                }
+              }
+            },
+            {
+              "type": "text",
+              "encode": {
+                "enter": {
+                  "baseline": {"value": "center"},
+                  "align": {"value": "right"},
+                  "fill": {"value": "#333"},
+                  "font": {"value": "monospace"}
+                },
+                "update": {
+                  "x": {"signal": "tooltip.x", "offset": -7},
+                  "y": {"signal": "tooltip.y", "offset": -0},
+                  "text": {"signal": "tooltip.description"},
+                  "fillOpacity": [
+                    {"test": "datum === tooltip", "value": 0},
+                    {"value": 1}
+                  ]
+                }
+              }
+            }
+          ]
+        };
+
+      var view = new vega.View(vega.parse(vegaJSONSpec))
+        .renderer('svg')          // set renderer (canvas or svg)
+        .initialize('#dendrogram') // initialize view within parent DOM container
+        .hover()                     // enable hover encode set processing
+        .run();                      // run the dataflow and render the view
+    </script>
+  </body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/my.css">
+  </head>
+  <body style="background-color: #44a0dd;">
+    <!--<button onclick="goBack()" style="position: fixed; width: 100px; left: 5%; top: 5%;">Go Back</button>-->
+    <!--<script>function goBack() { window.history.back(); }</script>-->
+
+    <div id="tooltip" style="margin-top: 0px;"></div>
+    <script src="lib/underscore.js"></script>
+    <script src="js/mapper.js"></script>
+    <script src="lib/d3.js"></script>
+    <script>
+      function findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        var items = location.search.substr(1).split("&");
+        for (var index = 0; index < items.length; index++) {
+            tmp = items[index].split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        }
+        return result;
+      }
+
+      var publications_path = 'data/possible_collaborations.csv'
+      var yearsArray = ['total'];
+      //var yearsArray = ['2008'];
+      var getYears = findGetParameter('years');
+      if (getYears != null) {
+          yearsArray = getYears.split(',');
+      }
+
+        //*******************************************************************
+        //  CREATE MATRIX AND MAP
+        //*******************************************************************
+        d3.csv(publications_path, function (error, data) {
+          var mpr = chordMpr(data);
+
+          mpr
+            .addValuesToMap('org1')
+            .addValuesToMap('org2')
+            .setFilter(function (row, a, b) {
+              return (row.org1 === a.name && row.org2 === b.name) ||
+                     (row.org1 === b.name && row.org2 === a.name)
+            })
+            .setAccessor(function (recs, a, b) {
+              if (!recs[0]) return 0;
+                // TODO understand this
+                //return recs[0].org1 === a.name ? +recs[0].flow1 : +recs[0].flow2;
+                var sum = 0;
+                for (let year of yearsArray){
+                    sum = sum + Number(recs[0][year]);
+                }
+                return sum;
+                //return + recs[0][yearsArray[0]];
+            });
+          drawChords(mpr.getMatrix(), mpr.getMap());
+        });
+        //*******************************************************************
+        //  DRAW THE CHORD DIAGRAM
+        //*******************************************************************
+        function drawChords (matrix, mmap) {
+          var w = 960, h =700, r1 = h / 2, r0 = r1 - 110;
+
+          var fill = d3.scale.ordinal()
+              .range(['#c7b570','#c6cdc7','#335c64','#768935','#507282','#5c4a56','#aa7455','#574109','#837722','#73342d','#0a5564','#9c8f57','#7895a4','#4a5456','#b0a690','#0a3542',]);
+
+          var chord = d3.layout.chord()
+              .padding(.02)
+              .sortSubgroups(d3.descending)
+              .sortChords(d3.descending);
+
+          var arc = d3.svg.arc()
+              .innerRadius(r0)
+              .outerRadius(r0 + 20);
+
+          var svg = d3.select("body").append("svg:svg")
+              .attr("width", w)
+              .attr("height", h)
+            .append("svg:g")
+              .attr("id", "circle")
+              .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
+
+              svg.append("circle")
+                  .attr("r", r0 + 20);
+
+          var rdr = chordRdr(matrix, mmap);
+          chord.matrix(matrix);
+
+          var g = svg.selectAll("g.group")
+              .data(chord.groups())
+            .enter().append("svg:g")
+              .attr("class", "group")
+              .on("mouseover", mouseover)
+              .on("mouseout", function (d) { d3.select("#tooltip").style("visibility", "hidden") });
+
+          g.append("svg:path")
+              .style("stroke", "black")
+              .style("fill", function(d) { return fill(rdr(d).gname); })
+              .attr("d", arc);
+
+          g.append("svg:text")
+              .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+              .attr("dy", ".35em")
+              .style("font-family", "helvetica, arial, sans-serif")
+              .style("font-size", "9px")
+              .attr("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+              .attr("transform", function(d) {
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                    + "translate(" + (r0 + 26) + ")"
+                    + (d.angle > Math.PI ? "rotate(180)" : "");
+              })
+              .text(function(d) { return rdr(d).gname; });
+
+            var chordPaths = svg.selectAll("path.chord")
+                  .data(chord.chords())
+                .enter().append("svg:path")
+                  .attr("class", "chord")
+                  .style("stroke", function(d) { return d3.rgb(fill(rdr(d).sname)).darker(); })
+                  .style("fill", function(d) { return fill(rdr(d).sname); })
+                  .attr("d", d3.svg.chord().radius(r0))
+                  .on("mouseover", function (d) {
+                    d3.select("#tooltip")
+                      .style("visibility", "visible")
+//                      .html(chordTip(rdr(d)))
+                      .style("top", function () { return (d3.event.pageY - 75)+"px"})
+                      .style("left", function () { return (d3.event.pageX - 150)+"px";})
+                  })
+                  .on("mouseout", function (d) { d3.select("#tooltip").style("visibility", "hidden") });
+
+            function chordTip (d) {
+              var p = d3.format(".1%"), q = d3.format(",.2f")
+              return "Chord Info:<br/>"
+                +  d.sname + " imports from " + d.tname
+                + ": $" + q(d.svalue) + "<br/>"
+                + p(d.svalue/d.stotal) + " of " + d.sname + "'s Total ($" + q(d.stotal) + ")<br/>"
+                + p(d.svalue/d.mtotal) + " of Matrix Total ($" + q(d.mtotal) + ")<br/>"
+                + "<br/>"
+                + d.tname + " imports from " + d.sname
+                + ": $" + q(d.tvalue) + "<br/>"
+                + p(d.tvalue/d.ttotal) + " of " + d.tname + "'s Total ($" + q(d.ttotal) + ")<br/>"
+                + p(d.tvalue/d.mtotal) + " of Matrix Total ($" + q(d.mtotal) + ")";
+            }
+
+            function groupTip (d) {
+              var names = {'BIOC': 'School of Biochemistry',
+               'BISC': 'School of Biological Sciences',
+               'CABI': 'Cabot Institute',
+               'CHEM': 'School of Chemistry',
+               'CHSE': 'Centre for Health Sciences Education',
+               'EDUC': 'Graduate School of Education',
+               'EFIM': 'School of Economics, Finance and Management',
+               'ENGF': 'Engineering Faculty Office',
+               'GELY': 'School of Earth Sciences',
+               'GEOG': 'School of Geographical Sciences',
+               'GSEN': 'Graduate School of Engineering',
+               'HUMS': 'School of Humanities',
+               'INOV': 'Centre for Innovation',
+               'LANG': 'Centre for English Language and Foundation Studies',
+               'LAWD': 'University of Bristol Law School',
+               'MATH': 'School of Mathematics',
+               'MDYF': 'Health Sciences Faculty Office',
+               'MEED': 'Centre for Medical Education',
+               'MODL': 'School of Modern Languages',
+               'MSAD': 'Biomedical Sciences Building',
+               'MVEN': "Merchant Venturers' School of Engineering",
+               'MVSF': 'Biomedical Sciences Faculty Office',
+               'NSQI': 'The Bristol Centre for Nanoscience and Quantum Information',
+               'ORDS': 'School of Oral & Dental Sciences',
+               'PANM': 'School of Cellular and Molecular Medicine',
+               'PHPH': 'School of Physiology, Pharmacology & Neuroscience',
+               'PHYS': 'School of Physics',
+               'PSYC': 'School of Experimental Psychology',
+               'QUEN': "Queen's School of Engineering",
+               'SART': 'School of Arts',
+               'SCIF': 'Science Faculty Office',
+               'SOCS': 'School of Clinical Sciences',
+               'SPAI': 'School of Sociology, Politics and International Studies',
+               'SPOL': 'School for Policy Studies',
+               'SSCM': 'School of Social and Community Medicine',
+               'VESC': 'School of Veterinary Sciences',
+               'REST': 'The remaining academic units'
+              };
+              var p = d3.format(".1%"), q = d3.format(",.2f")
+              return d.gname + "<br/>"
+                + names[d.gname] + "<br/>"
+                + q(d.gvalue) +  " of " + q(d.mtotal) + " (" + p(d.gvalue/d.mtotal) + " of Total Matrix)<br/>"
+            }
+
+            function mouseover(d, i) {
+              d3.select("#tooltip")
+                .style("visibility", "visible")
+                .html(groupTip(rdr(d)))
+                .style("top", function () { return (d3.event.pageY - 80)+"px"})
+                .style("left", function () { return (d3.event.pageX - 130)+"px";})
+
+              chordPaths.classed("fade", function(p) {
+                return p.source.index != i
+                    && p.target.index != i;
+              });
+            }
+        }
+    </script>
+  </body>
+</html>

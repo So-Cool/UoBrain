@@ -1,0 +1,115 @@
+[
+  {
+    "description": "ACADEMIC SCHOOL: School of Mathematics",
+    "name": "MATH",
+    "id": 1,
+    "parent": 3
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Chemistry",
+    "name": "CHEM",
+    "id": 2,
+    "parent": 3
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 3,
+    "parent": 5
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Physics",
+    "name": "PHYS",
+    "id": 4,
+    "parent": 5
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 5,
+    "parent": 7
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Biological Sciences",
+    "name": "BISC",
+    "id": 6,
+    "parent": 7
+  },
+  {
+    "description": "ACADEMIC SCHOOL: Merchant Venturers' School of Engineering",
+    "name": "MVEN",
+    "id": 8,
+    "parent": 10
+  },
+  {
+    "description": "The remaining academic units",
+    "name": "REST",
+    "id": 9,
+    "parent": 10
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 10,
+    "parent": 11
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 7,
+    "parent": 11
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Veterinary Sciences",
+    "name": "VESC",
+    "id": 12,
+    "parent": 13
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 11,
+    "parent": 13
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Social and Community Medicine",
+    "name": "SSCM",
+    "id": 14,
+    "parent": 16
+  },
+  {
+    "description": "ACADEMIC SCHOOL: School of Clinical Sciences",
+    "name": "SOCS",
+    "id": 15,
+    "parent": 16
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 16,
+    "parent": 17
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 13,
+    "parent": 17
+  },
+  {
+    "description": "ACADEMIC SCHOOL: Queen's School of Engineering",
+    "name": "QUEN",
+    "id": 18,
+    "parent": 19
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 17,
+    "parent": 19
+  },
+  {
+    "description": "",
+    "name": "",
+    "id": 19
+  }
+]

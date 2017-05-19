@@ -1,0 +1,75 @@
+.blue {
+  color: #44a0dd;
+}
+
+/* Embedded Vega examples. */
+.view .vega-bindings {
+  position: fixed;
+  width: 250px;
+  top: 10px;
+  right: 0;
+  font-size: 15px;
+  line-height: 15px;
+}
+.view .vega-bind {
+  align-content: left;
+}
+.view .vega-bind-name {
+  display: inline-block;
+  position: absolute;
+  width: 50px;
+  left: 0;
+  text-align: right;
+}
+.view .vega-bind-radio {
+  width: 200px;
+  text-align: left;
+  left: 0;
+}
+.view .vega-bind-radio label {
+  width: 50px;
+  margin-left: 1px;
+  margin-right: 4px;
+}
+.view .vega-bind input[type="range"] {
+  width: 100px;
+  padding: 0;
+}
+.view .vega-bind select {
+  max-width: 150px;
+}
+.view .vega-bind label {
+  width: 50px;
+  margin-left: 4px;
+}
+
+/*ord D3.js*/
+#tooltip {
+  color: white;
+  opacity: .9;
+  background: #333;
+  padding: 5px;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  position: absolute;
+  z-index: 10;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 10px;
+}
+#circle circle {
+  fill: none;
+  pointer-events: all;
+}
+path.group {
+  fill-opacity: .8;
+}
+path.chord {
+  fill-opacity: .8;
+  stroke: #000;
+  stroke-width: .25px;
+}
+#circle:hover path.fade {
+  display: none;
+}
