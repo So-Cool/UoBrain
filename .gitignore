@@ -3,3 +3,6 @@
 
 # Jekyll website
 doc/_site
+
+# Jupyter
+.ipynb_checkpoints
