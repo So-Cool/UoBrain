@@ -2,7 +2,7 @@
 *.DS_Store
 
 # Jekyll website
-doc/_site
+docs/_site
 
 # Jupyter
 .ipynb_checkpoints
