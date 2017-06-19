@@ -2,6 +2,10 @@
   color: #44a0dd;
 }
 
+a.white {
+  color: #bbbbbb;
+}
+
 /* Embedded Vega examples. */
 .view .vega-bindings {
   position: fixed;
